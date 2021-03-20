@@ -12,7 +12,16 @@ final class ImportsCommand: ParsableCommand {
   var path: String
   
   func run() throws {
-    // TODO: Find imports and send the information to standard output
+    let fileURL = URL(fileURLWithPath: path)
+    
+    let outputArray = try FileManager.default.swiftFiles(at: fileURL)
+      .reduce(Set<String>()) { result, url in
+        let output = try ImportsAnalyzer.analyze(fileURL: url)
+        return result.union(output)
+      }
+    
+    let output = outputArray.joined(separator: "\n")
+    print(output)
   }
 }
 
